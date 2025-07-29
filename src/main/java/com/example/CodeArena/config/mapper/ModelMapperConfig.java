@@ -1,4 +1,4 @@
-package com.example.CodeArena.config.modelMapper;
+package com.example.CodeArena.config.mapper;
 
 
 import org.modelmapper.ModelMapper;

@@ -17,13 +17,23 @@ import java.util.Date;
 
 @RequiredArgsConstructor
 @Component
+/**
+ * Класс для работы с JWT токенами: генерации, валидации и извлечения данных.
+ * <p>
+ * Использует симметричное шифрование на основе секретного ключа (HMAC-SHA256).
+ */
 public class JwtTokenProvider {
 
-    private final UserRepository userRepository;
     @Value("${jwt.secret}")
     private String base64Secret;
     private SecretKey secret;
 
+    /**
+     * Инициализирует секретный ключ на основе base64-строки из конфигурации.
+     * Вызывается автоматически после создания бина и инъекции зависимостей.
+     *
+∫     * @throws IllegalStateException если секретная строка невалидна или не может быть декодирована
+     */
     @PostConstruct
     private void initializeSecret() {
         byte[] keyBytes = Decoders.BASE64.decode(base64Secret);
@@ -31,7 +41,18 @@ public class JwtTokenProvider {
     }
 
     /**
-     * Генерация токена
+     * Генерирует JWT токен для указанного пользователя.
+     * <p>
+     * Токен содержит:
+     * <ul>
+     *   <li>Subject (email пользователя)</li>
+     *   <li>Дополнительные claims: email, роль и имя пользователя</li>
+     *   <li>Время выдачи (issued at)</li>
+     *   <li>Срок действия - 1 час с момента генерации</li>
+     * </ul>
+     *
+     * @param user объект пользователя, для которого генерируется токен
+     * @return сгенерированный JWT токен в виде строки
      */
     public String generateToken(User user) {
         return Jwts.builder()
@@ -46,7 +67,12 @@ public class JwtTokenProvider {
     }
 
     /**
-     * Извлечение email
+     * Извлекает email пользователя из JWT токена.
+     *
+     * @param token JWT токен для парсинга
+     * @return email пользователя, указанный в subject токена
+     * @throws JwtException если токен невалиден или не может быть распарсен
+     * @throws IllegalArgumentException если токен равен null или пустой
      */
     public String extractEmail(String token) {
         return Jwts.parserBuilder()
@@ -58,17 +84,22 @@ public class JwtTokenProvider {
     }
 
     /**
-     * Проверка валидности токена
+     * Проверяет валидность JWT токена.
+     * <p>
+     * Проверяет:
+     * <ul>
+     *   <li>Корректность подписи</li>
+     *   <li>Срок действия токена</li>
+     *   <li>Общую структуру токена</li>
+     * </ul>
+     *
+     * @param token токен для проверки
+     * @return true если токен валиден, false если токен невалиден или истек срок его действия
      */
-    public boolean isTokenValid(String token) {
-        try {
+    public void checkToken(String token) {
             Jwts.parserBuilder()
                     .setSigningKey(secret)
                     .build()
                     .parseClaimsJws(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
     }
 }

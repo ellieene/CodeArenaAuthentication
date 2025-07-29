@@ -10,6 +10,10 @@ import org.springframework.validation.annotation.Validated;
 
 import java.lang.annotation.*;
 
+
+/**
+ * Annotation to the username/email
+ */
 @Documented
 @Constraint(validatedBy = ValidLoginAndEmailValidator.class)
 @Target({ElementType.FIELD, ElementType.PARAMETER})

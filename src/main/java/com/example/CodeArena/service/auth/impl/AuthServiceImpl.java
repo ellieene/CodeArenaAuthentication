@@ -1,38 +1,33 @@
-package com.example.CodeArena.service;
+package com.example.CodeArena.service.auth.impl;
 
 import com.example.CodeArena.config.security.component.JwtTokenProvider;
 import com.example.CodeArena.exception.DuplicateDataException;
 import com.example.CodeArena.exception.EntityNotFoundException;
 import com.example.CodeArena.exception.InvalidCredentialsException;
-import com.example.CodeArena.model.dto.UserDTO;
 import com.example.CodeArena.model.entity.User;
 import com.example.CodeArena.model.enums.Role;
 import com.example.CodeArena.model.request.UserAuthorizationRequest;
 import com.example.CodeArena.model.request.UserRegistrationRequest;
 import com.example.CodeArena.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import com.example.CodeArena.service.auth.AuthService;
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.example.CodeArena.util.CommonStrings.*;
 
 @Service
 @AllArgsConstructor
-public class UserService {
+public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final ModelMapper modelMapper;
 
-    /**
-     * Registration
-     *
-     * @param userRegistrationRequest {@link UserRegistrationRequest}
-     */
+
     @Transactional
+    @Override
     public void registration(UserRegistrationRequest userRegistrationRequest) {
         userRepository.findByEmailOrUsername(userRegistrationRequest.email(), userRegistrationRequest.username()).ifPresent(user -> {
             if (user.getUsername().equals(userRegistrationRequest.username())) {
@@ -51,33 +46,15 @@ public class UserService {
         userRepository.save(newUser);
     }
 
-    /**
-     * Authorization
-     *
-     * @param userAuthorizationRequest {@link UserAuthorizationRequest}
-     * @return JWT token
-     */
-    @Transactional
+    @Transactional(readOnly = true)
+    @Override
     public String authorization(UserAuthorizationRequest userAuthorizationRequest) {
         User user = userRepository
                 .findByEmailOrUsername(userAuthorizationRequest.username(), userAuthorizationRequest.username())
                 .orElseThrow(() -> new EntityNotFoundException(UNCORRECT_EMAIL_AND_LOGIN));
-        if(!passwordEncoder.matches(userAuthorizationRequest.password(), user.getPassword())){
+        if (!passwordEncoder.matches(userAuthorizationRequest.password(), user.getPassword())) {
             throw new InvalidCredentialsException(UNCORRECT_PASSWORD);
         }
         return jwtTokenProvider.generateToken(user);
-    }
-
-    /**
-     * Получение пользователя
-     *
-     */
-    public UserDTO me(String login) {
-        User user = userRepository
-                .findByEmailOrUsername(login, login)
-                .orElseThrow(() -> new EntityNotFoundException(UNCORRECT_EMAIL_AND_LOGIN));
-        UserDTO userDTO = new UserDTO();
-        modelMapper.map(user, userDTO);
-        return userDTO;
     }
 }

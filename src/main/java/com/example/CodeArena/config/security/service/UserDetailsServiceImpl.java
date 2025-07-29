@@ -16,9 +16,20 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
+    /**
+     * Загружает детали пользователя по его логину или email.
+     *
+     * @param userLoginOrEmail логин или email пользователя, по которому осуществляется поиск
+     * @return объект {@link UserDetails}, содержащий информацию о найденном пользователе
+     * @throws UsernameNotFoundException если пользователь с указанным логином/email не найден
+     * @throws EntityNotFoundException если пользователь не существует
+     *
+     * @see UserRepository#findByEmailOrUsername(String, String) (String, String)
+     * @see UserDetails
+     */
     @Override
-    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        return userRepository.findByEmailOrUsername(usernameOrEmail, usernameOrEmail)
+    public UserDetails loadUserByUsername(String userLoginOrEmail) throws UsernameNotFoundException {
+        return userRepository.findByEmailOrUsername(userLoginOrEmail, userLoginOrEmail)
                 .orElseThrow(() ->
                         new EntityNotFoundException(UNCORRECT_EMAIL_AND_LOGIN)
                 );

@@ -1,6 +1,7 @@
 package com.example.CodeArena.config.security.component;
 
 import com.example.CodeArena.config.security.service.UserDetailsServiceImpl;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final static String HEADER_PREFIX = "Bearer ";
     private final UserDetailsServiceImpl customUserDetailsService;
     private final JwtTokenProvider jwtService;
+    private final JwtExceptionResponseMapper exceptionResponseMapper;
 
     /**
      * Метод для парсинга токена авторизации при запросе
@@ -33,27 +35,30 @@ public class JwtTokenFilter extends OncePerRequestFilter {
      */
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String authorizationHeader = request.getHeader(HEADER_NAME);
+        try {
+            String authorizationHeader = request.getHeader(HEADER_NAME);
 
-        String jwt = null;
-        String username = null;
+            String jwt = null;
+            String username = null;
 
-        if (authorizationHeader != null && authorizationHeader.startsWith(HEADER_PREFIX)) {
-            jwt = authorizationHeader.substring(7);
-            username = jwtService.extractEmail(jwt);
-        }
+            if (authorizationHeader != null && authorizationHeader.startsWith(HEADER_PREFIX)) {
+                jwt = authorizationHeader.substring(7);
+                username = jwtService.extractEmail(jwt);
+            }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.customUserDetailsService.loadUserByUsername(username);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.customUserDetailsService.loadUserByUsername(username);
 
-            if (jwtService.isTokenValid(jwt)) {
+                jwtService.checkToken(jwt);
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
-        }
 
-        filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response);
+        } catch (JwtException | IllegalArgumentException e) {
+            exceptionResponseMapper.handleJwtException(response, e);
+        }
     }
 }

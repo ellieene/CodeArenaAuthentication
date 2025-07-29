@@ -3,8 +3,15 @@ package com.example.CodeArena.config.annotation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
+
 public class ValidLoginAndEmailValidator implements ConstraintValidator<ValidLoginAndEmail, String> {
 
+    /**
+     * Check for a valid login/email
+     * @param value  login/email
+     * @param context error
+     * @return boolean
+     */
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         if (value == null || value.trim().isEmpty()) {
