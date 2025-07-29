@@ -3,7 +3,12 @@ package com.example.CodeArena.model.entity;
 import com.example.CodeArena.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -13,7 +18,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,4 +37,29 @@ public class User {
     private Role role;
 
     private Integer points = 0;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // или логика блокировки
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // или логика блокировки
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // если есть срок действия пароля
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // или isEmailConfirmed, isActive и т.д.
+    }
 }
