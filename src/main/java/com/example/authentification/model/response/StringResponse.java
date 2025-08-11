@@ -1,4 +1,4 @@
-package com.example.authentification.model.responce;
+package com.example.authentification.model.response;
 
 
 import lombok.AllArgsConstructor;

@@ -60,7 +60,7 @@ public class JwtTokenProvider {
                 .claim("role", user.getRole())
                 .claim("name", user.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000))  // 1 час
+                .setExpiration(new Date(System.currentTimeMillis() + 36000000))  // 1 час
                 .signWith(secret, SignatureAlgorithm.HS256)
                 .compact();
     }

@@ -12,22 +12,12 @@ import org.springframework.security.web.SecurityFilterChain;
 
 
 /**
- * Configuration on the Secyrity
+ * Configuration on the PasswordEncoderConfig
  */
 @Configuration
-@EnableWebSecurity
-@RequiredArgsConstructor
-public class SecurityConfig {
+public class PasswordEncoderConfig {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable);
-        return http.build();
-    }
+
     /**
      * Создает и возвращает кодировщик паролей для хеширования.
      * <p>
