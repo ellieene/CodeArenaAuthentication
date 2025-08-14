@@ -18,7 +18,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements UserDetails {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -38,28 +38,28 @@ public class User implements UserDetails {
 
     private Integer points = 0;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true; // или логика блокировки
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true; // или логика блокировки
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true; // если есть срок действия пароля
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true; // или isEmailConfirmed, isActive и т.д.
-    }
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        return List.of(new SimpleGrantedAuthority(role.name()));
+//    }
+//
+//    @Override
+//    public boolean isAccountNonExpired() {
+//        return true; // или логика блокировки
+//    }
+//
+//    @Override
+//    public boolean isAccountNonLocked() {
+//        return true; // или логика блокировки
+//    }
+//
+//    @Override
+//    public boolean isCredentialsNonExpired() {
+//        return true; // если есть срок действия пароля
+//    }
+//
+//    @Override
+//    public boolean isEnabled() {
+//        return true; // или isEmailConfirmed, isActive и т.д.
+//    }
 }
