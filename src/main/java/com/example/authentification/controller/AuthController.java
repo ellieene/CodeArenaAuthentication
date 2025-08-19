@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@Tag(name = "Authentication")
+@Tag(name = "Code Arena Authentication")
 public class AuthController {
 
     private final AuthServiceImpl authServiceImpl;

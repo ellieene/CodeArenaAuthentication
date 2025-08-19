@@ -56,6 +56,7 @@ public class JwtTokenProvider {
     public String generateToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getEmail())
+                .claim("userId", user.getId())
                 .claim("email", user.getEmail())
                 .claim("role", user.getRole())
                 .claim("name", user.getUsername())
